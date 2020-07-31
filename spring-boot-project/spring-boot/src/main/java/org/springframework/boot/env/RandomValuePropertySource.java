@@ -137,7 +137,12 @@ public class RandomValuePropertySource extends PropertySource<Random> {
 		return DigestUtils.md5DigestAsHex(bytes);
 	}
 
+	/**
+	 * RandomValuePropertySource 加入优先级
+	 * 很重要，后面慢慢研究，今天只关注配置源
+	 **/
 	public static void addToEnvironment(ConfigurableEnvironment environment) {
+		//加载环境变量优先级后面  addAfter
 		environment.getPropertySources().addAfter(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
 				new RandomValuePropertySource(RANDOM_PROPERTY_SOURCE_NAME));
 		logger.trace("RandomValuePropertySource add to Environment");

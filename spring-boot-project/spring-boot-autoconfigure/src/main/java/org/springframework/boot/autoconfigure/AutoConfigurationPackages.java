@@ -120,6 +120,7 @@ public abstract class AutoConfigurationPackages {
 
 		@Override
 		public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+			//将注解标注的元信息传入，获取到相应的包名
 			register(registry, new PackageImport(metadata).getPackageName());
 		}
 

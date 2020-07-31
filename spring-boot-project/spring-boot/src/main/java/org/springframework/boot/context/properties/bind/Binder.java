@@ -502,7 +502,9 @@ public class Binder {
 	 * @since 2.2.0
 	 */
 	public static Binder get(Environment environment, BindHandler defaultBindHandler) {
+		// 这里的get方法就是获取configurationProperties的属性源
 		Iterable<ConfigurationPropertySource> sources = ConfigurationPropertySources.get(environment);
+		// 初始化占位符解析器
 		PropertySourcesPlaceholdersResolver placeholdersResolver = new PropertySourcesPlaceholdersResolver(environment);
 		return new Binder(sources, placeholdersResolver, null, null, defaultBindHandler);
 	}

@@ -92,7 +92,7 @@ class ImportAutoConfigurationImportSelector extends AutoConfigurationImportSelec
 		}
 		return loadFactoryNames(source);
 	}
-
+	//	这个方法是让SpringFactoryLoader去加载一些组件的名字
 	protected Collection<String> loadFactoryNames(Class<?> source) {
 		return SpringFactoriesLoader.loadFactoryNames(source, getClass().getClassLoader());
 	}

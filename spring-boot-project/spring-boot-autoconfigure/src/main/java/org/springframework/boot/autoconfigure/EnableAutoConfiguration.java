@@ -75,10 +75,18 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
  * @see AutoConfigureAfter
  * @see SpringBootApplication
  */
+/**
+ * @EnableAutoConfiguration就是借助@Import来收集所有符合自动配置条件的bean定义，并加载到IoC容器。
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
+/**
+ * @AutoConfigurationPackage：自动配置包，它也是一个组合注解，其中最重要的注解是@Import(AutoConfigurationPackages.Registrar.class)，
+ * 它是spring框架的底层注解，它的作用就是给容器中导入某个组件类，
+ *使用@AutoConfigurationPackage注解就是将主程序类所在包及所有子包下的组件到扫描到spring容器中
+ */
 @AutoConfigurationPackage
 @Import(AutoConfigurationImportSelector.class)
 public @interface EnableAutoConfiguration {

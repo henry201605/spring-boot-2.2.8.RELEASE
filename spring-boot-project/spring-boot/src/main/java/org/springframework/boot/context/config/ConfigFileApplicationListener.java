@@ -94,7 +94,7 @@ import org.springframework.util.StringUtils;
  * and the 'spring.config.location' property can be used to specify alternative search
  * locations or specific files.
  * <p>
- *
+ *从默认的位置加载配置文件，并将其加入 上下文的 environment变量中
  * @author Dave Syer
  * @author Phillip Webb
  * @author Stephane Nicoll
@@ -181,7 +181,17 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 		}
 	}
 
+	/**
+	 * 监听到事件后，处理方法
+	 **/
 	private void onApplicationEnvironmentPreparedEvent(ApplicationEnvironmentPreparedEvent event) {
+		//从spring.factories下获取所有的EnvironmentPostProcessor
+		// EnvironmentPostProcessor为springboot动态管理自定义配置源的接口
+		//默认3个（json转换啊，系统参数重载啊，vopc云服务相关的）
+		/**
+		 *  还有就是ConfigFileApplicationListener 自身也实现可该接口
+		 *  加载springboot相关配置源到容器中。
+		 **/
 		List<EnvironmentPostProcessor> postProcessors = loadPostProcessors();
 		postProcessors.add(this);
 		AnnotationAwareOrderComparator.sort(postProcessors);
@@ -314,8 +324,13 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 
 		Loader(ConfigurableEnvironment environment, ResourceLoader resourceLoader) {
 			this.environment = environment;
+			//占位符解析(@Value("${}"))
 			this.placeholdersResolver = new PropertySourcesPlaceholdersResolver(this.environment);
+			//资源地址加载（）
 			this.resourceLoader = (resourceLoader != null) ? resourceLoader : new DefaultResourceLoader();
+			//spring.factories中PropertySourceLoader
+			// （org.springframework.boot.env.PropertiesPropertySourceLoader,\
+			//org.springframework.boot.env.YamlPropertySourceLoader）
 			this.propertySourceLoaders = SpringFactoriesLoader.loadFactories(PropertySourceLoader.class,
 					getClass().getClassLoader());
 		}
@@ -327,18 +342,23 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 						this.processedProfiles = new LinkedList<>();
 						this.activatedProfiles = false;
 						this.loaded = new LinkedHashMap<>();
+						// 这里通过initializeProfiles()方法获取到default即默认环境
 						initializeProfiles();
 						while (!this.profiles.isEmpty()) {
 							Profile profile = this.profiles.poll();
+							//如果不是默认的，是dev的话，添加到环境中
 							if (isDefaultProfile(profile)) {
 								addProfileToEnvironment(profile.getName());
 							}
+							// 备注1：第一次循环进来读取到默认的default，第二次循环进来读取到dev(项目存在两个配置文件分别是application.yml和application-dev.yml)
 							load(profile, this::getPositiveProfileFilter,
 									addToLoaded(MutablePropertySources::addLast, false));
 							this.processedProfiles.add(profile);
 						}
 						load(null, this::getNegativeProfileFilter, addToLoaded(MutablePropertySources::addFirst, true));
+						//设置加载配置文件的顺序
 						addLoadedPropertySources();
+						//将StandardServletEnvironment的环境设置为dev。
 						applyActiveProfiles(defaultProperties);
 					});
 		}
@@ -441,6 +461,7 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 			getSearchLocations().forEach((location) -> {
 				boolean isFolder = location.endsWith("/");
 				Set<String> names = isFolder ? getSearchNames() : NO_SEARCH_NAMES;
+				// load方法通过application前缀 + 环境标识 + 后缀拼接配置文件
 				names.forEach((name) -> load(location, name, profile, filterFactory, consumer));
 			});
 		}
@@ -667,6 +688,20 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 			return new LinkedHashSet<>(list);
 		}
 
+		/**
+		 * 依次加载配置文件到最后。
+		 **/
+		/**
+		 * 变更后优先级顺序：
+		 * 1、commonLine 属性
+		 * 2、servlet 上下文
+		 * 3、servlet 配置文件
+		 * 4、Jndi 属性源
+		 * 5、java参数属性源。
+		 * 6、环境变量属性源。
+		 * 7、random属性源。
+		 * 8、springboot 配置源（application-dev.yml 优先于application.yml）
+		 */
 		private void addLoadedPropertySources() {
 			MutablePropertySources destination = this.environment.getPropertySources();
 			List<MutablePropertySources> loaded = new ArrayList<>(this.loaded.values());

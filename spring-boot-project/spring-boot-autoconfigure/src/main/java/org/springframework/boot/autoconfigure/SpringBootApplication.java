@@ -45,6 +45,15 @@ import org.springframework.data.repository.Repository;
  * @author Andy Wilkinson
  * @since 1.2.0
  */
+/**
+ * 1、springboot应用启动；
+ * 2、@SpringBootApplication起作用；
+ * 3、@EnableAutoConfiguration；
+ * 4、@AutoConfigurationPackage：这个组合注解主要是@Import(AutoConfigurationPackages.Registrar.class)，
+ *    它通过将Registrar类导入到容器中，而Registrar类作用是扫描主配置类同级目录以及子包，并将相应的组件导入到springboot创建管理的容器中；
+ * 5、@Import(AutoConfigurationImportSelector.class)：它通过将AutoConfigurationImportSelector类导入到容器中，
+ *    AutoConfigurationImportSelector类作用是通过selectImports方法实现将配置类信息交给SpringFactory加载器进行一系列的容器创建过程
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

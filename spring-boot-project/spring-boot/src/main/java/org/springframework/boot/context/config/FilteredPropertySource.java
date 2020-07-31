@@ -51,6 +51,7 @@ class FilteredPropertySource extends PropertySource<PropertySource<?>> {
 		MutablePropertySources propertySources = environment.getPropertySources();
 		PropertySource<?> original = propertySources.get(propertySourceName);
 		if (original == null) {
+			//jdk8的语法，调用Consumer里的Lamada
 			operation.accept(null);
 			return;
 		}

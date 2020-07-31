@@ -88,6 +88,11 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 	private ResourceLoader resourceLoader;
 
+	/**
+	 * selectImports这个方法告诉springboot都需要导入那些组件：
+	 * @param annotationMetadata
+	 * @return
+	 */
 	@Override
 	public String[] selectImports(AnnotationMetadata annotationMetadata) {
 		if (!isEnabled(annotationMetadata)) {
@@ -112,7 +117,9 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		if (!isEnabled(annotationMetadata)) {
 			return EMPTY_ENTRY;
 		}
+		//将注解元信息封装成注解属性对象
 		AnnotationAttributes attributes = getAttributes(annotationMetadata);
+		//获取到配置类的全路径字符串集合
 		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);
 		configurations = removeDuplicates(configurations);
 		Set<String> exclusions = getExclusions(annotationMetadata, attributes);
@@ -168,6 +175,11 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 * @return a list of candidate configurations
 	 */
 	protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
+		/**
+		 * 这个方法需要传入两个参数getSpringFactoriesLoaderFactoryClass()和getBeanClassLoader()
+		 * getSpringFactoriesLoaderFactoryClass()这个方法返回的是EnableAutoConfiguration.class
+		 * getBeanClassLoader()这个方法返回的是beanClassLoader（类加载器）
+		 */
 		List<String> configurations = SpringFactoriesLoader.loadFactoryNames(getSpringFactoriesLoaderFactoryClass(),
 				getBeanClassLoader());
 		Assert.notEmpty(configurations, "No auto configuration classes found in META-INF/spring.factories. If you "

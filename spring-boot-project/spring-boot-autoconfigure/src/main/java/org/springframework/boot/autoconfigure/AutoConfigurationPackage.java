@@ -33,6 +33,10 @@ import org.springframework.context.annotation.Import;
  * @since 1.3.0
  * @see AutoConfigurationPackages
  */
+/**
+ * @Import(AutoConfigurationPackages.Registrar.class)，它就是将Registrar这个组件类导入到容器中，
+ * 可查看Registrar类中registerBeanDefinitions方法，这个方法就是导入组件类的具体实现
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

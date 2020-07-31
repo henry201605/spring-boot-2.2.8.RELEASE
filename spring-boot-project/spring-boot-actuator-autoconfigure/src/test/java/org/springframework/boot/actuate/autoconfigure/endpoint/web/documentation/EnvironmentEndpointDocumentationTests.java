@@ -137,6 +137,9 @@ class EnvironmentEndpointDocumentationTests extends MockMvcEndpointDocumentation
 		EnvironmentEndpoint endpoint(ConfigurableEnvironment environment) {
 			return new EnvironmentEndpoint(new AbstractEnvironment() {
 
+				/**
+				 * 初始化StandardServletEnvironments时，默认添加几种propertySources。
+				 **/
 				@Override
 				protected void customizePropertySources(MutablePropertySources propertySources) {
 					environment.getPropertySources().stream().filter(this::includedPropertySource)
