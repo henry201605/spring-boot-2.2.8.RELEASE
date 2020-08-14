@@ -41,10 +41,11 @@ import org.springframework.util.StringUtils;
  * @author Phillip Webb
  * @since 1.0.0
  */
+
 public class DelegatingApplicationListener implements ApplicationListener<ApplicationEvent>, Ordered {
 
 	// NOTE: Similar to org.springframework.web.context.ContextLoader
-
+	//在配置文件中配置监听，类似于在监听类上加@Component
 	private static final String PROPERTY_NAME = "context.listener.classes";
 
 	private int order = 0;
@@ -53,7 +54,7 @@ public class DelegatingApplicationListener implements ApplicationListener<Applic
 
 	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
-		if (event instanceof ApplicationEnvironmentPreparedEvent) {
+		if (event instanceof ApplicationEnvironmentPreparedEvent) {//监听ApplicationEnvironmentPreparedEvent事件
 			List<ApplicationListener<ApplicationEvent>> delegates = getListeners(
 					((ApplicationEnvironmentPreparedEvent) event).getEnvironment());
 			if (delegates.isEmpty()) {
@@ -61,7 +62,7 @@ public class DelegatingApplicationListener implements ApplicationListener<Applic
 			}
 			this.multicaster = new SimpleApplicationEventMulticaster();
 			for (ApplicationListener<ApplicationEvent> listener : delegates) {
-				this.multicaster.addApplicationListener(listener);
+				this.multicaster.addApplicationListener(listener);//将监听事件加入spring容器中
 			}
 		}
 		if (this.multicaster != null) {
@@ -74,7 +75,7 @@ public class DelegatingApplicationListener implements ApplicationListener<Applic
 		if (environment == null) {
 			return Collections.emptyList();
 		}
-		String classNames = environment.getProperty(PROPERTY_NAME);
+		String classNames = environment.getProperty(PROPERTY_NAME);//获取配置文件中配置的监听器
 		List<ApplicationListener<ApplicationEvent>> listeners = new ArrayList<>();
 		if (StringUtils.hasLength(classNames)) {
 			for (String className : StringUtils.commaDelimitedListToSet(classNames)) {
